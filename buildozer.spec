@@ -1,37 +1,49 @@
 [app]
 
-# (str) Título do aplicativo
+# Título do aplicativo
 title = Ditado Game
 
-# (str) Nome do pacote
+# Nome do pacote
 package.name = ditadogame
 
-# (str) Domínio do pacote
+# Domínio do pacote
 package.domain = org.ditadogame
 
-# (str) Pasta onde está o main.py
+# Pasta principal do projeto
 source.dir = .
 
-# (str) Arquivos que serão incluídos
+# Arquivos incluídos no APK
 source.include_exts = py,png,jpg,jpeg,kv,atlas,wav,mp3,txt
 
-# (str) Versão do aplicativo
+# Versão do aplicativo
 version = 1.0
 
-# (str) Dependências Python
-requirements = python3,kivy
+# Dependências
+requirements = python3,kivy==2.3.1
 
-# (str) Orientação
+# Orientação
 orientation = portrait
 
-# (str) Tela cheia
+# Tela cheia
 fullscreen = 0
+
+# Versão mínima do Android
+android.minapi = 24
+
+# Arquiteturas
+android.archs = arm64-v8a,armeabi-v7a
+
+# Backend gráfico
+android.add_src =
+
+# Nome do arquivo APK
+android.entrypoint = org.kivy.android.PythonActivity
 
 
 [buildozer]
 
-# (str) Log level
+# Nível de log
 log_level = 2
 
-# (int) Warning level
+# Não executar como root
 warn_on_root = 1
