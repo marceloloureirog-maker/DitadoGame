@@ -30,6 +30,10 @@ fullscreen = 0
 # Versão mínima do Android
 android.minapi = 24
 
+
+# API do Android utilizada na compilação
+android.api = 33
+
 # Arquiteturas
 android.archs = arm64-v8a,armeabi-v7a
 
