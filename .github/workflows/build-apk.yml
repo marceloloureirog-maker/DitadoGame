@@ -25,22 +25,45 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y openjdk-17-jdk
 
-      - name: Aceitar licenças Android
+      - name: Instalar Android SDK
         run: |
-          yes | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          export ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk
 
-      - name: Instalar Android SDK Build Tools
-        run: |
-          yes | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager \
+          mkdir -p "$ANDROID_HOME/cmdline-tools"
+
+          cd "$ANDROID_HOME/cmdline-tools"
+
+          curl -L -o tools.zip \
+            https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+
+          unzip -q tools.zip
+
+          mv cmdline-tools latest
+
+          rm tools.zip
+
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+
+          yes | sdkmanager --licenses || true
+
+          sdkmanager \
             "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0"
+            "platforms;android-33" \
+            "build-tools;33.0.2"
 
       - name: Verificar Android SDK
         run: |
-          ls -la ${ANDROID_HOME}/build-tools
-          ls -la ${ANDROID_HOME}/build-tools/35.0.0
-          ${ANDROID_HOME}/build-tools/35.0.0/aidl --version
+          export ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+
+          echo "Android SDK:"
+          echo "$ANDROID_HOME"
+
+          echo "Build Tools instalados:"
+          ls -la "$ANDROID_HOME/build-tools"
+
+          echo "AIDL:"
+          "$ANDROID_HOME/build-tools/33.0.2/aidl" --help
 
       - name: Instalar Buildozer
         run: |
