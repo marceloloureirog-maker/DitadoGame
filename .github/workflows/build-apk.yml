@@ -38,7 +38,11 @@ jobs:
             zlib1g-dev \
             openjdk-17-jdk \
             unzip \
-            wget
+            wget \
+            autoconf \
+            automake \
+            libtool \
+            pkg-config
 
       - name: Instalar Buildozer e Cython
         run: |
@@ -57,8 +61,7 @@ jobs:
           cp -r cmdline-tools/* ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/
           rm -rf cmdline-tools cmdline.zip
 
-          # 3. CRUCIAL: Cria o link simbólico da pasta legada 'tools' apontando para 'cmdline-tools/latest'
-          # Isso corrige o erro: 'tools/bin/sdkmanager does not exist'
+          # 3. Cria o link simbólico da pasta legada 'tools' apontando para 'cmdline-tools/latest'
           ln -s ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest ~/.buildozer/android/platform/android-sdk/tools
 
           # 4. Injeta os arquivos de licença pré-aceitos
