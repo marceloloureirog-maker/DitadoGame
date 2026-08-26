@@ -45,18 +45,29 @@ jobs:
           pip install --upgrade pip setuptools
           pip install buildozer cython
 
-      - name: Baixar e configurar Android Command-line Tools (sdkmanager)
+      - name: Baixar e estruturar Android Command-line Tools
         run: |
-          # Prepara pastas do SDK
-          mkdir -p ~/.buildozer/android/platform/android-sdk/cmdline-tools
+          # Prepara os diretórios exatos exigidos pelo Android SDK
+          mkdir -p ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
           
-          # Baixa o Command-line Tools do Android oficial
+          # Baixa o pacote oficial de ferramentas de linha de comando
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
           unzip -q cmdline-tools.zip
-          mv cmdline-tools ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
-          rm cmdline-tools.zip
+          
+          # Move todo o conteúdo extraído para a pasta 'latest'
+          cp -r cmdline-tools/* ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/
+          rm -rf cmdline-tools cmdline-tools.zip
 
-          # Aceita todas as licenças usando o sdkmanager recém-instalado
+      - name: Aceitar Licenças do Android SDK
+        run: |
+          # Cria pasta de licenças
+          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+          
+          # Injeta os hashes de licença diretamente
+          echo -e "2433370246379200086071292701363007201609\n84831b9409646a918e30573bab4c9c91346d8abd\nc59f171788ac820192a430720b1905d04d2a1063" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          echo -e "84831b9409646a918e30573bab4c9c91346d8abd" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
+          
+          # Aceita licenças dinamicamente usando o sdkmanager configurado
           yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Compilar o APK com Buildozer
