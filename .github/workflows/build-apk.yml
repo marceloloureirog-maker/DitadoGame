@@ -1,7 +1,9 @@
-name: Build Android APK
+name: Build Android App
 
 on:
   push:
+    branches: [ "main" ]
+  pull_request:
     branches: [ "main" ]
   workflow_dispatch:
 
@@ -10,32 +12,53 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout do código
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'zulu'
-        java-version: '17'
+      - name: Instalar dependências do sistema
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            git \
+            ffmpeg \
+            libsdl2-dev \
+            libsdl2-image-dev \
+            libsdl2-mixer-dev \
+            libsdl2-ttf-dev \
+            libportmidi-dev \
+            libswscale-dev \
+            libavformat-dev \
+            libavcodec-dev \
+            zlib1g-dev \
+            openjdk-17-jdk \
+            unzip
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential libffi-dev libssl-dev libltdl-dev openjdk-17-jdk zip unzip ccache git
-        pip install --upgrade pip buildozer cython
+      - name: Instalar Buildozer e Cython
+        run: |
+          pip install --upgrade pip setuptools
+          pip install buildozer cython
 
-    - name: Build APK with Buildozer
-      run: |
-        buildozer android debug
+      - name: Inicializar SDK e Aceitar Licenças do Android
+        run: |
+          # Executa o buildozer para iniciar o download da estrutura do SDK
+          buildozer android update || true
+          
+          # Aceita automaticamente todas as licenças do Android SDK
+          yes | /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          yes | /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --licenses || true
 
-    - name: Upload APK Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-debug
-        path: bin/*.apk
+      - name: Compilar o APK com Buildozer
+        run: |
+          buildozer android debug
+
+      - name: Salvar o APK gerado como Artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: bin/*.apk
