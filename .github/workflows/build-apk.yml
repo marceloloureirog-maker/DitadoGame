@@ -37,28 +37,31 @@ jobs:
             libavcodec-dev \
             zlib1g-dev \
             openjdk-17-jdk \
-            unzip
+            unzip \
+            wget
 
       - name: Instalar Buildozer e Cython
         run: |
           pip install --upgrade pip setuptools
           pip install buildozer cython
 
-      - name: Pré-criar pasta e aceitar Licenças do Android SDK
+      - name: Baixar e configurar Android Command-line Tools (sdkmanager)
         run: |
-          # Cria as pastas de licença do Android SDK antes da compilação
-          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+          # Prepara pastas do SDK
+          mkdir -p ~/.buildozer/android/platform/android-sdk/cmdline-tools
           
-          # Injeta os hashes de licença aceitos oficialmente pelo Google Android SDK
-          echo -e "2433370246379200086071292701363007201609\n84831b9409646a918e30573bab4c9c91346d8abd\nc59f171788ac820192a430720b1905d04d2a1063" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-          echo -e "84831b9409646a918e30573bab4c9c91346d8abd" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
-          echo -e "d9715e3842108635799ec111d59188382879e1b7" > ~/.buildozer/android/platform/android-sdk/licenses/android-googletv-license
-          echo -e "6010087178a4e8689f6499b3d956882786b437e1" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-arm-dbt-license
+          # Baixa o Command-line Tools do Android oficial
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
+          unzip -q cmdline-tools.zip
+          mv cmdline-tools ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
+          rm cmdline-tools.zip
+
+          # Aceita todas as licenças usando o sdkmanager recém-instalado
+          yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Compilar o APK com Buildozer
         run: |
-          # Aceita qualquer prompt extra que o Buildozer possa solicitar durante o build
-          yes | buildozer android debug
+          buildozer android debug
 
       - name: Salvar o APK gerado como Artefato
         uses: actions/upload-artifact@v4
