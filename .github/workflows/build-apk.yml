@@ -49,28 +49,6 @@ jobs:
           pip install --upgrade pip setuptools
           pip install buildozer cython
 
-      - name: Preparar Estrutura Completa do Android SDK
-        run: |
-          # 1. Cria a estrutura de diretórios necessária
-          mkdir -p ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
-          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
-
-          # 2. Baixa e extrai as ferramentas de linha de comando
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline.zip
-          unzip -q cmdline.zip
-          cp -r cmdline-tools/* ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/
-          rm -rf cmdline-tools cmdline.zip
-
-          # 3. Cria o link simbólico da pasta legada 'tools' apontando para 'cmdline-tools/latest'
-          ln -s ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest ~/.buildozer/android/platform/android-sdk/tools
-
-          # 4. Injeta os arquivos de licença pré-aceitos
-          echo -e "2433370246379200086071292701363007201609\n84831b9409646a918e30573bab4c9c91346d8abd\nc59f171788ac820192a430720b1905d04d2a1063" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-          echo -e "84831b9409646a918e30573bab4c9c91346d8abd" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
-
-          # 5. Aceita todas as licenças usando o sdkmanager
-          yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
-
       - name: Compilar o APK com Buildozer
         run: |
           buildozer android debug
