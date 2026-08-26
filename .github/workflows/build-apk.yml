@@ -44,18 +44,21 @@ jobs:
           pip install --upgrade pip setuptools
           pip install buildozer cython
 
-      - name: Inicializar SDK e Aceitar Licenças do Android
+      - name: Pré-criar pasta e aceitar Licenças do Android SDK
         run: |
-          # Executa o buildozer para iniciar o download da estrutura do SDK
-          buildozer android update || true
+          # Cria as pastas de licença do Android SDK antes da compilação
+          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
           
-          # Aceita automaticamente todas as licenças do Android SDK
-          yes | /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          yes | /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --licenses || true
+          # Injeta os hashes de licença aceitos oficialmente pelo Google Android SDK
+          echo -e "2433370246379200086071292701363007201609\n84831b9409646a918e30573bab4c9c91346d8abd\nc59f171788ac820192a430720b1905d04d2a1063" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          echo -e "84831b9409646a918e30573bab4c9c91346d8abd" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
+          echo -e "d9715e3842108635799ec111d59188382879e1b7" > ~/.buildozer/android/platform/android-sdk/licenses/android-googletv-license
+          echo -e "6010087178a4e8689f6499b3d956882786b437e1" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-arm-dbt-license
 
       - name: Compilar o APK com Buildozer
         run: |
-          buildozer android debug
+          # Aceita qualquer prompt extra que o Buildozer possa solicitar durante o build
+          yes | buildozer android debug
 
       - name: Salvar o APK gerado como Artefato
         uses: actions/upload-artifact@v4
